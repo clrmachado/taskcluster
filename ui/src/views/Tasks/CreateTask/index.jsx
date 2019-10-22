@@ -40,6 +40,7 @@ import urls from '../../../utils/urls';
 import createTaskQuery from '../createTask.graphql';
 import Button from '../../../components/Button';
 import db from '../../../utils/db';
+import DialogAction from '../../../components/DialogAction';
 
 const taskPayload = interactive => {
   let defaultPayload = {
@@ -56,8 +57,7 @@ const taskPayload = interactive => {
   if (interactive) {
     defaultPayload = {
       ...defaultPayload,
-      // 30s margin to avoid task timeout winning race against task command.
-      maxRunTime: 3600 + 30,
+      maxRunTime: 3600,
       features: {
         interactive: true,
       },
@@ -113,6 +113,7 @@ export default class CreateTask extends Component {
     createdTaskError: null,
     loading: false,
     recentTaskDefinitions: [],
+    dialogOpen: false,
   };
 
   async componentDidMount() {
@@ -128,6 +129,7 @@ export default class CreateTask extends Component {
         recentTaskDefinitions,
         task: this.parameterizeTask(task),
         error: null,
+        dialogOpen: this.props.interactive,
       });
     } catch (err) {
       this.setState({
@@ -264,6 +266,7 @@ export default class CreateTask extends Component {
       createdTaskId,
       loading,
       recentTaskDefinitions,
+      dialogOpen,
     } = this.state;
 
     if (createdTaskId && interactive) {
@@ -374,6 +377,17 @@ export default class CreateTask extends Component {
                 />
               </SpeedDial>
             </Fragment>
+          )}
+          {dialogOpen && (
+            <DialogAction
+              open={dialogOpen}
+              title="Interactive Task"
+              body="You are changing the task to be interactive"
+              onClose={() => this.setState({ dialogOpen: false })}
+              confirmText="Ok"
+              onComplete={() => this.setState({ dialogOpen: false })}
+              onSubmit={() => this.setState({ dialogOpen: false })}
+            />
           )}
         </Fragment>
       </Dashboard>
