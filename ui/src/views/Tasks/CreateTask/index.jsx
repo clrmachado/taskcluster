@@ -80,6 +80,21 @@ const defaultTask = interactive => ({
     source: `${window.location.origin}/tasks/create`,
   },
 });
+const DialogInteractiveChangeText = () => (
+  <div>
+    Selecting an interactive task will apply the following changes to the task
+    definition:
+    <ul>
+      <li>Set task.payload.features.interactive = true</li>
+      <li>Strip task.payload.caches to avoid poisoning</li>
+      <li>Ensures task.payload.maxRunTime is minimum of 60 minutes</li>
+      <li>Strip task.routes to avoid side-effects</li>
+      <li>Set the environement variable TASKCLUSTER_INTERACTIVE=true</li>
+    </ul>
+    Note: This will not work with all tasks. You may not have the scopes
+    required to create the task.
+  </div>
+);
 
 @hot(module)
 @withApollo
@@ -382,8 +397,8 @@ export default class CreateTask extends Component {
             <DialogAction
               open={dialogOpen}
               title="Interactive Task"
-              body="You are changing the task to be interactive"
-              onClose={() => this.setState({ dialogOpen: false })}
+              body={<DialogInteractiveChangeText />}
+              onClose={() => this.props.history.replace('task/create')}
               confirmText="Ok"
               onComplete={() => this.setState({ dialogOpen: false })}
               onSubmit={() => this.setState({ dialogOpen: false })}
